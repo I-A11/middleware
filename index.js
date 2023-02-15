@@ -15,6 +15,14 @@ app.use("/dogs", (req, res, next) => {
   next();
 });
 
+const verifyPassword = (req, res, next) => {
+  const { password } = req.query;
+  if (password === "chicken") {
+    next();
+  }
+  res.send("YOU NEED A PASSWORD");
+};
+
 // app.use((req, res, next) => {
 //   console.log("From middleware with love!!!");
 //   return next();
@@ -33,6 +41,10 @@ app.get("/dogs", (req, res) => {
   console.log(`REQUESTED DATE: ${req.requestTime}`);
 
   res.send("WOOF WOOF");
+});
+
+app.get("/secret", verifyPassword, (req, res) => {
+  res.send("Sometimes I put headphone");
 });
 
 app.use((req, res) => {
