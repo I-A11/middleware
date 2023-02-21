@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const AppError = require("./AppError");
+
 const app = express();
 
 app.use(morgan("tiny"));
@@ -20,8 +22,9 @@ const verifyPassword = (req, res, next) => {
   if (password === "chicken") {
     next();
   }
+  throw new AppError("password required", 401);
   // res.send("YOU NEED A PASSWORD");
-  throw new Error("Password required");
+  // throw new AppError( "Password required");
 };
 
 app.get("/", (req, res) => {
@@ -43,16 +46,24 @@ app.get("/secret", verifyPassword, (req, res) => {
   res.send("Sometimes I put headphone");
 });
 
+app.get("/admin", (req, res) => {
+  throw new AppError("You are not an admin", 403);
+});
+
 app.use((req, res) => {
   res.status(404).send("NOT FOUND!!!");
 });
 
+// app.use((err, req, res, next) => {
+//   console.log("****************************************");
+//   console.log("****************ERROR*******************");
+//   console.log("****************************************");
+//   // res.status(500).send("OH BOY WE GOT AN ERROR");
+//   next(err);
+// });
 app.use((err, req, res, next) => {
-  console.log("****************************************");
-  console.log("****************ERROR*******************");
-  console.log("****************************************");
-  // res.status(500).send("OH BOY WE GOT AN ERROR");
-  next(err);
+  const { status = 500, message = "Something went wrong" } = err;
+  res.status(status).send(message);
 });
 
 app.listen(3000, () => {
