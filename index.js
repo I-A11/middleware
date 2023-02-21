@@ -20,23 +20,19 @@ const verifyPassword = (req, res, next) => {
   if (password === "chicken") {
     next();
   }
-  res.send("YOU NEED A PASSWORD");
+  // res.send("YOU NEED A PASSWORD");
+  throw new Error("Password required");
 };
-
-// app.use((req, res, next) => {
-//   console.log("From middleware with love!!!");
-//   return next();
-//   console.log("Maybe love after calling next() "); // use return before to make sure nothing will running after next()
-// });
-// app.use((req, res, next) => {
-//   console.log("From second middleware with love!!!");
-//   return next();
-// });
 
 app.get("/", (req, res) => {
   console.log(`REQUESTED DATE: ${req.requestTime}`);
   res.send("HOME PAGE");
 });
+
+app.get("/error", (req, res) => {
+  chicken.fly();
+});
+
 app.get("/dogs", (req, res) => {
   console.log(`REQUESTED DATE: ${req.requestTime}`);
 
@@ -49,6 +45,14 @@ app.get("/secret", verifyPassword, (req, res) => {
 
 app.use((req, res) => {
   res.status(404).send("NOT FOUND!!!");
+});
+
+app.use((err, req, res, next) => {
+  console.log("****************************************");
+  console.log("****************ERROR*******************");
+  console.log("****************************************");
+  // res.status(500).send("OH BOY WE GOT AN ERROR");
+  next(err);
 });
 
 app.listen(3000, () => {
